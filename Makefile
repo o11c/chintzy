@@ -10,6 +10,7 @@ vpath %.cpp ${BASE}
 vpath %.hpp ${BASE}
 
 SOURCES := $(subst ${BASE}/,,$(wildcard ${BASE}/src/*.cpp))
+HEADERS := $(subst ${BASE}/,,$(wildcard ${BASE}/src/*.hpp))
 OBJECTS := $(patsubst src/%.cpp,obj/%.o,${SOURCES})
 BINS := main
 
@@ -27,3 +28,7 @@ main: ${OBJECTS}
 
 clean:
 	rm -rf obj ${BINS}
+test:
+	set -e; for s in ${HEADERS} ${SOURCES}; do cp $$s input; ./main; mv output $$s; done
+	rm input
+	git diff --exit-code
