@@ -1,0 +1,15 @@
+language: cpp
+
+notifications:
+  irc:
+    channels: "chat.freenode.net#tmwa"
+    on_success: always
+    on_failure: always
+    use_notice: true
+
+script:
+  - mkdir build
+  - cd build
+  - ln -s ../Makefile
+  - make
+  - make test
