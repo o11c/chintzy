@@ -1,6 +1,6 @@
 #include <fstream>
 
-#include "parse.hpp"
+#include "parser.hpp"
 
 int main()
 {
@@ -8,5 +8,13 @@ int main()
     // but it forces me to use the right streams
     std::ifstream in("input");
     std::ofstream out("output");
-    parse_root(in, out);
+    std::ofstream err("error");
+    try
+    {
+        parse_start(in, out, err);
+    }
+    catch (int x)
+    {
+        return x;
+    }
 }

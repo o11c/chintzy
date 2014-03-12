@@ -19,10 +19,12 @@ objects: ${OBJECTS}
 
 %: obj/%.o
 	${CXX} ${LDFLAGS} $^ ${LDLIBS} -o $@
-obj/%.o: src/%.cpp | obj/.
+obj/%.o: src/%.cpp ${HEADERS} | obj/.
 	${CXX} ${CPPFLAGS} ${CXXFLAGS} -c -o $@ $<
 obj/.:
 	mkdir obj
+
+override CXXFLAGS += -std=c++0x
 
 main: ${OBJECTS}
 
@@ -31,4 +33,5 @@ clean:
 test:
 	set -e; for s in ${HEADERS} ${SOURCES}; do cp $$s input; ./main; mv output $$s; done
 	rm input
+	rm error
 	git diff --exit-code
