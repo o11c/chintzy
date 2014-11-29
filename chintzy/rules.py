@@ -52,8 +52,8 @@ class Grammar:
                         continue
                     seen_edges.add(e)
                     if e not in self.rules:
-                        if not is_known(e):
-                            assert False, 'UNKNOWN in %s: %s -> %s' % (self.std, rulename, e)
+                        if not is_known(self.name, e):
+                            assert False, 'UNKNOWN in %s.%s: %s -> %s' % (self.std, self.name, rulename, e)
                         e += '-x-from-' + rulename
                         node(e, elabel)
                     edge(rulename, e)
@@ -116,16 +116,18 @@ class Grammar:
                 else:
                     rule.add_alt(el)
 
-def is_known(e):
-    if '$' in e:
+def is_known(mode, e):
+    if e.startswith('$'):
         return True
-    if len(e) == 1:
+    assert '$' not in e
+    if mode == 'lex' and len(e) == 1:
         if e.isalnum() or e == '_':
             return True
-    if e in '''
+    if mode == 'lex' and e in '''
         \\
         '
         "
+        .
     '''.split():
         return True
     if e in '''
@@ -140,7 +142,7 @@ def is_known(e):
         return True
 
     # keywords (C++, C, operator names)
-    if e in '''
+    if mode in {'lex', 'parse'} and e in '''
         alignas
         alignof
         asm
@@ -246,7 +248,8 @@ def is_known(e):
         return True
 
     # preprocessor keywords
-    if e in '''
+    if mode == 'preprocessor' and e in '''
+        if
         ifdef
         ifndef
         elif
@@ -262,19 +265,24 @@ def is_known(e):
         return True
 
     # accessed across bounds; special context-dependent keywords
-    if e in '''
+    if mode == 'parse' and e in '''
         string-literal
-        preprocessing-token
-        enumeration-constant
-        constant
-        literal
         identifier
-        identifier-list
-        constant-expression
+        literal
+        constant
+        enumeration-constant
 
         final
         override
         ""
+        0
+    '''.split():
+        return True
+    if mode == 'preprocessor' and e in '''
+        identifier
+        constant-expression
+        preprocessing-token
+        identifier-list
     '''.split():
         return True
     return False
