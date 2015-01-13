@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import trace
 
@@ -9,13 +10,13 @@ def inner_main():
 
 def main():
     ignored = [
-            sys.base_prefix, # how is this different than sys.prefix?
-            sys.base_exec_prefix, # is this really needed?
-            'chintzy/tests/',
+            sys.prefix,
+            sys.exec_prefix,
+            os.path.realpath('chintzy/tests/'),
     ]
     ignorem = [
             'coverage',
-            'dots',
+            'runtests',
     ]
     tracer = trace.Trace(
             ignoredirs=ignored, ignoremods=ignorem,
@@ -24,5 +25,16 @@ def main():
     r = tracer.results()
     r.write_results(show_missing=True, coverdir='.coverage')
 
+def main_maybe_pypy():
+    try:
+        import __pypy__
+    except ImportError:
+        print('Enabling coverage (running under CPython).')
+        main()
+    else:
+        print('Disabling coverage (running under PyPy).')
+        import runtests
+        runtests.main()
+
 if __name__ == '__main__':
-    main()
+    main_maybe_pypy()

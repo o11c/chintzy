@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 def cut_prefix(word, prefix):
     if word.startswith(prefix):
         return word[len(prefix):]
@@ -8,7 +10,7 @@ def cut_suffix(word, suffix):
         return word[:-len(suffix)]
     return word
 
-class Grammar:
+class Grammar(object):
     __slots__ = ('std', 'name', 'txt', 'rules')
 
     def __init__(self, std, name, txt):
@@ -53,7 +55,7 @@ class Grammar:
                     seen_edges.add(e)
                     if e not in self.rules:
                         if not is_known(self.name, e):
-                            assert False, 'UNKNOWN in %s.%s: %s -> %s' % (self.std, self.name, rulename, e)
+                            assert False, 'UNKNOWN in %s.%s: %s -> %s' % (self.std, self.name, rulename, e) #pragma NO COVER
                         e += '-x-from-' + rulename
                         node(e, elabel)
                     edge(rulename, e)
@@ -88,7 +90,7 @@ class Grammar:
                 elif c == '$ONE OF':
                     one_of = True
                 else:
-                    assert False, 'Unknown modifier: ' + c
+                    assert False, 'Unknown modifier: ' + c #pragma NO COVER
                 rule = self.rules[r] = Rule(r)
             else:
                 l = l.strip()
@@ -107,7 +109,7 @@ class Grammar:
                     elif l == '$any character except a ) followed by d-char-sequence and double quote':
                         pass
                     else:
-                        assert False, 'warning: unknown special case: ' + l
+                        assert False, 'warning: unknown special case: ' + l #pragma NO COVER
                 else:
                     el = l.split()
                 if one_of:
@@ -285,9 +287,9 @@ def is_known(mode, e):
         identifier-list
     '''.split():
         return True
-    return False
+    return False #pragma NO COVER
 
-class Rule:
+class Rule(object):
     __slots__ = ('name', 'alts')
 
     def __init__(self, name):
