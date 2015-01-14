@@ -9,11 +9,19 @@ def inner_main():
     runtests.main()
 
 def main():
+    # the `trace` module has some major, documented, bugs in its
+    # `ignoremods` facility, but `ignoredirs` seems to work.
+
+    this_dir = os.path.realpath('chintzy/')
+
     ignored = [
-            sys.prefix,
-            sys.exec_prefix,
-            os.path.realpath('chintzy/tests/'),
+            os.path.realpath('chintzy/tests/')
     ]
+    for p in sys.path:
+        p = os.path.realpath(p)
+        if not this_dir.startswith(p):
+            ignored.append(p)
+    print(__file__, ignored)
     ignorem = [
             'coverage',
             'runtests',

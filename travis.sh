@@ -1,4 +1,5 @@
 #!/bin/sh -e
+rm -rf .coverage/
 python ./coverage.py
 ! rgrep -n '^>' .coverage
 rv=$?
