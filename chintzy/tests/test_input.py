@@ -10,7 +10,7 @@ from chintzy.input import (
 )
 
 
-class InputTestCase(unittest.TestCase):
+class TestInput(unittest.TestCase):
 
     def setUp(self):
         pass
