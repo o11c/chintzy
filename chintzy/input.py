@@ -8,6 +8,14 @@ from wcwidth import wcswidth
 
 Location = namedtuple('Location', ['index_in_file', 'nominal_line', 'index_in_line', 'nominal_column'])
 Span = namedtuple('Span', ['begin', 'end'])
+def __repr__(self):
+    return ('<Span %u:%u - %u:%u>'
+        % (
+            self.begin.nominal_line, self.begin.nominal_column,
+            self.end.nominal_line, self.end.nominal_column,
+    ))
+Span.__repr__ = __repr__
+del __repr__
 
 def tab(vcol):
     return vcol - ((vcol - 1) % 8) + 8
@@ -29,13 +37,21 @@ class InputSource(object):
         self._text = body
         self._loc = self.begin_location()
 
+    def __repr__(self):
+        return ('<chintzy.input.InputSource at %s:%u:%u, codepoint %u/%u>'
+            % (
+                self._filename,
+                self._loc.nominal_line, self._loc.nominal_column,
+                self._loc.index_in_file, len(self._text),
+        ))
+
     def begin_location(self):
         return Location(0, 1, 0, 1)
 
     def adv(self):
-        self._loc = self.calc_adv(self._loc)
+        self._loc = self._calc_adv(self._loc)
 
-    def calc_adv(self, loc):
+    def _calc_adv(self, loc):
         i, l, c, v = loc
         old_ch = self._text[i]
         i += 1
@@ -56,10 +72,12 @@ class InputSource(object):
             v += w
         return Location(i, l, c, v)
 
-    def get(self, loc=None):
+    def get(self, offset=0, loc=None):
         if loc is None:
             loc = self._loc
-        i = loc.index_in_file
+        i = loc.index_in_file + offset
+        if offset:
+            loc = None
         return loc, self._text[i:i+1]
 
     def message_str(self, *args, **kwargs):
@@ -91,9 +109,9 @@ class InputSource(object):
             dots = ''
         print(' ' * spaces, '^', '~' * squiggles, dots, sep='', file=file)
 
-    def __iter__(self, one_more=False, loc=None):
+    def iter(self, one_more=False, loc=None):
         while True:
-            l, c = self.get(loc)
+            l, c = self.get(loc=loc)
             if not c:
                 if one_more:
                     yield l, c
@@ -102,4 +120,4 @@ class InputSource(object):
             if loc is None:
                 self.adv()
             else:
-                loc = self.calc_adv(loc)
+                loc = self._calc_adv(loc)

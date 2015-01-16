@@ -1,2 +1,8 @@
+# Earlier versions don't support combining characters.
 wcwidth>=0.1.4
+
+# Lowest tested version; earlier versions may work.
 pytest>=2.6.3
+
+# Lowest tested version; earlier versions may work.
+enum34>=1.0.4

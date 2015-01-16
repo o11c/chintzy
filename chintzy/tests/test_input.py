@@ -20,11 +20,11 @@ class InputTestCase(unittest.TestCase):
 
     def test_iter(self):
         i = InputSource('<string>', 'a')
-        assert ''.join(c for _, c in i.__iter__(loc=i.begin_location())) == 'a\n'
-        assert ''.join(c for _, c in i) == 'a\n'
-        assert ''.join(c for _, c in i) == ''
-        assert ''.join(c for _, c in i.__iter__(loc=i.begin_location())) == 'a\n'
-        assert ''.join(c for _, c in i) == ''
+        assert ''.join(c for _, c in i.iter(loc=i.begin_location())) == 'a\n'
+        assert ''.join(c for _, c in i.iter()) == 'a\n'
+        assert ''.join(c for _, c in i.iter()) == ''
+        assert ''.join(c for _, c in i.iter(loc=i.begin_location())) == 'a\n'
+        assert ''.join(c for _, c in i.iter()) == ''
 
     def test_location(self):
         i = InputSource('<string>', 'a\n')
@@ -61,7 +61,7 @@ class InputTestCase(unittest.TestCase):
             (h, _), (i, _), (n3, _),
             (j, _), (n4, _),
             (x, _),
-        ) = src.__iter__(one_more=True)
+        ) = src.iter(one_more=True)
 
         assert (src.message_str(Span(a, a), 'error', 'the sky is falling', '-Wchicken') ==
 '''<string>:1:1: error: the sky is falling [-Wchicken]
@@ -230,13 +230,13 @@ j
             ('aa\uff20\uff20\uff20\t', 16),
         ]:
             src = InputSource('<string>', src)
-            for (x, _) in src:
+            for (x, _) in src.iter():
                 pass
             assert x.nominal_column == width + 1
 
     def test_unprintable(self):
         src = InputSource('<string>', 'a\v \fb')
-        for x, c in src:
+        for x, c in src.iter():
             if c == 'a':
                 a = x
             elif c == 'b':
