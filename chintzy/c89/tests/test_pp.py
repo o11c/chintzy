@@ -40,6 +40,31 @@ class TestPp(unittest.TestCase):
             lex.adv()
         assert repr(t) == 'chintzy.%s.pp.PpQuoteHeaderName(<Span 2:10 - 2:13>, \'"c\\\\"\')' % name
 
+    def test_lex_nasty(self):
+        # These four cases require a second char of lookahead,
+        # one way or another
+        for left, right in [
+            ('.', '.'),     # . and ... are tokens
+            ('%:', '%'),    # %: and %:%: are tokens
+            ('<', '::'),    # <: : should be tokenized as < ::
+            ('1', "' '"),   # not a digit separator
+        ]:
+            nasty = left + right
+
+            if left == '%:' and name == 'c89':
+                continue
+            if right == '::' and not name.startswith('cxx'):
+                continue
+
+            lex = PreprocessorLexer(InputSource('<string>', nasty))
+            assert lex.get()._text == left
+            lex.adv()
+            assert lex.get()._text == right
+            lex.adv()
+            assert lex.get()._text == '\n'
+            lex.adv()
+            assert not lex.get()
+
     def test_lex_ident(self):
         cases = []
         cases += [

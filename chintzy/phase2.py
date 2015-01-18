@@ -69,6 +69,10 @@ class Phase2(object):
                 # This is sad but I don't care enough to find a solution.
         ))
 
+    # Does not handle trigraphs or backslash-newline, but screw them.
+    def peek_harder(self):
+        return self._src.get(offset=0)[1]
+
     def get(self):
         return self._cur
 

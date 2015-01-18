@@ -264,6 +264,16 @@ class PreprocessorLexer(object):
             while True:
                 ph2.adv()
                 tb2 = ph2.get()
+                # The three nasty cases.
+                if tb._buffer == '.' and tb2._buffer == '.':
+                    if ph2.peek_harder() != '.':
+                        break
+                if tb._buffer == '%:' and tb2._buffer == '%':
+                    if ph2.peek_harder() != ':':
+                        break
+                if tb._buffer == '<' and tb2._buffer == ':':
+                    if ph2.peek_harder() == ':':
+                        break
                 if tb2._buffer == '\n':
                     # Avoid an assertion error in TokenBuffer.__add__, if
                     # a file ends with backslash-newline (which will generate
@@ -298,14 +308,7 @@ class PreprocessorLexer(object):
             if not (tb._buffer == '.' and tb2._buffer in pp_digits):
                 if tb._buffer == '#' and header_name_phase == 1:
                     self._header_name_phase = 2
-                if tb in fake_punctuation:
-                    # there are three cases here currently:
-                    # .. (needed for ..., should lex as . . instead)
-                    # %:% (needed for %:%:, should lex as %: % instead)
-                    # <:: (would normally be <: :, but should be < ::)
-                    # TODO handle this later like template >> ?
-                    # a true compiler can't because of token pasting
-                    self.fatal(tb, 'sorry, unimplemented: early breaking of fake punctuation') #pragma NO COVER
+                assert tb not in fake_punctuation
                 return PpPunctuation(*tb)
         if tb._buffer in pp_digits_or_dot:
             # dot is already advanced from the operator feeding
@@ -325,16 +328,12 @@ class PreprocessorLexer(object):
                         tb += tb2
                         ph2.adv()
                     continue #pragma NO COVER
-                if tb2._buffer in pp_digit_separators:
+                # The fourth nasty case.
+                if tb2._buffer in pp_digit_separators and ph2.peek_harder() in pp_identx:
                     tb += tb2
                     ph2.adv()
                     tb2 = ph2.get()
-                    if not (tb2._buffer in pp_identx):
-                        # TODO should be the start of a new character literal
-                        # testcase: 1' '
-                        # gcc 4.9 errors, bug 64626
-                        # clang 3.4 accepts
-                        self.fatal(tb2, 'sorry, unimplemented: digit separator not followed by a digit or nondigit') #pragma NO COVER
+                    assert tb2._buffer in pp_identx
                     tb += tb2
                     ph2.adv()
                     continue
