@@ -213,7 +213,7 @@ escape-sequence:
     hexadecimal-escape-sequence
     universal-character-name
 
-simple-escape-sequence:   $ONE OF
+simple-escape-sequence:
     \ '
     \ "
     \ ?

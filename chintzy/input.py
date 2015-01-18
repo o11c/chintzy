@@ -87,6 +87,7 @@ class InputSource(object):
 
     def message(self, span, cat, mes, opt='always enabled', file=None):
         if file is None:
+            import sys #pragma NO COVER
             file = sys.stderr #pragma NO COVER
         print('%s:%u:%u: %s: %s [%s]'
                 % (self._filename, span.begin.nominal_line, span.begin.nominal_column, cat, mes, opt),

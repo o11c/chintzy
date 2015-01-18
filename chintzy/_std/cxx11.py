@@ -213,7 +213,7 @@ escape-sequence:
     octal-escape-sequence
     hexadecimal-escape-sequence
 
-simple-escape-sequence:   $ONE OF
+simple-escape-sequence:
     \ '
     \ "
     \ ?

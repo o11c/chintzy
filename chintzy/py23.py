@@ -1,4 +1,4 @@
 try:
     unicode
-except NameError:
-    unicode = str
+except NameError: #pragma NO COVER
+    unicode = str #pragma NO COVER

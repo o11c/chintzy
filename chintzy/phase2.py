@@ -11,6 +11,13 @@ class TokenBuffer(object):
         self._end = end
         self._buffer = unicode() + buf
 
+    def __repr__(self):
+        return ('chintzy.phase2.TokenBuffer(%r, %s)'
+            % (
+                Span(self._begin, self._end),
+                repr(self._buffer).lstrip('u')
+        ))
+
     def __iadd__(self, tb):
         assert (self._end.index_in_file + 1 == tb._begin.index_in_file
             or (self._end.index_in_file < tb._begin.index_in_file
@@ -68,6 +75,9 @@ class Phase2(object):
     def adv(self):
         self._cur = self._calc_next()
 
+    def adv_raw(self):
+        self._cur = self._calc_next_raw()
+
     def _calc_next(self):
         # loop just for backslash-newline's `continue`
         while True:
@@ -96,9 +106,15 @@ class Phase2(object):
                     # especially when it's not a "reasonable program"?
                     if l2.index_in_file + 2 != len(self._src._text):
                         self._src.adv()
-                    continue
+                    continue #pragma NO COVER
             break
         return TokenBuffer(l, l2, c)
+
+    def _calc_next_raw(self):
+        l, c = self._src.get()
+        if c != '':
+            self._src.adv()
+        return TokenBuffer(l, l, c)
 
     def iter(self, one_more=False):
         while True:

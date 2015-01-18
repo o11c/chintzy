@@ -58,14 +58,19 @@ e:
 
     def test_phase2(self):
         from chintzy.input import InputSource
-        from chintzy.phase2 import Phase2
+        from chintzy.phase2 import Phase2, TokenBuffer
         p2 = Phase2(InputSource('<string>', 'abc'))
         assert repr(p2) == "<chintzy.phase2.Phase2 at <string>:1:1, forming 'a'>"
+        assert repr(p2.get()) == "chintzy.phase2.TokenBuffer(<Span 1:1 - 1:1>, 'a')"
         p2.adv()
         assert repr(p2) == "<chintzy.phase2.Phase2 at <string>:1:2, forming 'b'>"
+        assert repr(p2.get()) == "chintzy.phase2.TokenBuffer(<Span 1:2 - 1:2>, 'b')"
         p2.adv()
         assert repr(p2) == "<chintzy.phase2.Phase2 at <string>:1:3, forming 'c'>"
+        assert repr(p2.get()) == "chintzy.phase2.TokenBuffer(<Span 1:3 - 1:3>, 'c')"
         p2.adv()
         assert repr(p2) == "<chintzy.phase2.Phase2 at <string>:1:4, forming '\\n'>"
+        assert repr(p2.get()) == "chintzy.phase2.TokenBuffer(<Span 1:4 - 1:4>, '\\n')"
         p2.adv()
         assert repr(p2) == "<chintzy.phase2.Phase2 at <string>:2:1, forming ''>"
+        assert repr(p2.get()) == "chintzy.phase2.TokenBuffer(<Span 2:1 - 2:1>, '')"
